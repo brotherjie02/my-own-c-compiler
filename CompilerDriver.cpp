@@ -5,19 +5,18 @@
 #include <string>
 #include <iostream>
 #include <cstdio>
+#include <filesystem>
 
 int main(int argc, char **argv)
 {
     std::string inputFileName = argv[1]; // first argument is always the input file
-    // Strip extension
-    std::string baseName = inputFileName;
-    size_t dot = baseName.find_last_of('.');
-    if (dot != std::string::npos)
-    {
-        baseName = baseName.substr(0, dot);
-    }
+    std::filesystem::path inputPath(inputFileName);
+    std::string baseName = inputPath.stem();
+    inputPath = inputPath.parent_path();
 
-    std::string command = "gcc -E -P " + inputFileName + " -o PREPROCESSED_" + inputFileName;
+    std::string preprocessedName = inputPath / ("PREPROCESSED_" + baseName + ".c");
+
+    std::string command = "gcc -E -P " + inputFileName + " -o " + preprocessedName;
 
     if (std::system(command.c_str()) == 0)
     {
@@ -28,10 +27,9 @@ int main(int argc, char **argv)
     {
         std::cout << "Preprocessed Stage Failed" << std::endl;
     }
+    std::string asmName = inputPath / (baseName + ".s");
 
-    std::string preName = "PREPROCESSED_" + inputFileName;
-
-    command = "gcc -S PREPROCESSED_" + inputFileName + " -o " + baseName + ".s";
+    command = "gcc -S " + preprocessedName + " -o " + asmName;
     if (std::system(command.c_str()) == 0)
     {
         std::cout << "Compiled Stage Success" << std::endl;
@@ -41,7 +39,7 @@ int main(int argc, char **argv)
         std::cout << "Compiled Stage Failed" << std::endl;
     }
 
-    if (remove(preName.c_str()) == 0)
+    if (remove(preprocessedName.c_str()) == 0)
     {
         std::cout << "Removed Preprocessed Stage Success" << std::endl;
     }
@@ -50,7 +48,9 @@ int main(int argc, char **argv)
         std::cout << "Removed Preprocessed Stage Failed" << std::endl;
     }
 
-    command = "gcc " + baseName + ".s -o " + baseName;
+    std::string objectName = inputPath / baseName;
+
+    command = "gcc " + asmName + " -o " + objectName;
     if (std::system(command.c_str()) == 0)
     {
         std::cout << "Assemble and Linking Stage Success" << std::endl;
@@ -59,14 +59,13 @@ int main(int argc, char **argv)
     {
         std::cout << "Assemble and Linking Stage Failed" << std::endl;
     }
-    std::string asmFileName = baseName + ".s";
-    if (remove(asmFileName.c_str()) == 0)
+    if (remove(asmName.c_str()) == 0)
     {
-        std::cout << "Removed Preprocessed Stage Success" << std::endl;
+        std::cout << "Removed Asm Stage Success" << std::endl;
     }
     else
     {
-        std::cout << "Removed Preprocessed Stage Failed" << std::endl;
+        std::cout << "Removed Asm Stage Failed" << std::endl;
     }
 
     return 0;
