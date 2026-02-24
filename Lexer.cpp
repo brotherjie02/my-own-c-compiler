@@ -1,7 +1,7 @@
 #include "Lexer.h"
-#include <regex>
 #include <string_view>
 #include <fstream>
+#include "Keyword.h"
 
 using namespace std;
 
@@ -16,4 +16,8 @@ Lexer::Lexer(const char *filepath)
 
     string buffer(fileSize, '/0');
     fileStream.read(buffer.data(), fileSize);
+}
+
+void Lexer::Peak()
+{
 }

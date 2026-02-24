@@ -1,25 +1,14 @@
 #pragma once
 #include <string>
-
-enum Kind
-{
-    IDENTIFIER,
-    CONSTANT,
-    PUNCTUATION,
-    ENDOFFILE,
-
-};
-
-struct Token
-{
-    Token();
-};
+#include <unordered_map>
+#include "Token.h"
 
 class Lexer
 {
 public:
     Lexer();
     Lexer(const char *filepath);
+    void Peak();
 
 private:
     const char *m_filepath;
