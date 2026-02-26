@@ -27,10 +27,13 @@ enum TokenKind
 
 struct Token
 {
-    Token()
+    Token(TokenKind kind, std::string_view text)
     {
+        m_kind = kind;
+        m_lexeme = text;
+        m_length = text.size();
     }
     TokenKind m_kind;
-    std::string m_lexeme;
+    std::string_view m_lexeme;
     int m_length;
 };

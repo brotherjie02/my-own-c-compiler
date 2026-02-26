@@ -43,3 +43,4 @@
 #ignore executable file without extensions
 CompilerDriver
 return_2
+Lexer
