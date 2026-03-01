@@ -35,21 +35,52 @@ char Lexer::peak()
 
 char Lexer::advance()
 {
-    char outputChar = m_buffer[m_pos];
     m_pos++;
+    char outputChar = m_buffer[m_pos];
     return outputChar;
 }
 
 Token Lexer::nextToken()
 {
-    char currentChar = peak();
+    char firstChar = peak();
     // peak to see what type
-    if (currentChar == '\0')
+    if (firstChar == '\0')
     {
         return Token(Endoffile, '\0');
     }
-    else if (isAlpha(currentChar) || currentChar == '_')
+    else if (isAlpha(firstChar) || firstChar == '_') // identifier
     {
+        size_t tokenLength = 0;
+        char curChar = peak();
+        while (isAlpha(curChar) || isNum(curChar) || curChar == '_')
+        {
+            tokenLength++;
+            curChar = advance();
+        }
+        string_view text(&m_buffer[m_pos], tokenLength);
+        // keyword?
+        TokenKind kind = GetKindOfIdentifier(text.data());
+
+        if (kind != Kw_Invalid)
+        {
+            return Token(kind, text);
+        }
+        else
+        {
+            return Token(Identifier, text);
+        }
+    }
+    else if (isNum(firstChar))
+    {
+        size_t tokenLength = 0;
+        char curChar = peak();
+        while (isNum(curChar))
+        {
+            tokenLength++;
+            curChar = advance();
+        }
+        string_view text(&m_buffer[m_pos - tokenLength], tokenLength);
+        return Token(Constant, text);
     }
 }
 
