@@ -6,18 +6,7 @@
 #include <string>
 #include <string_view>
 
-std::unordered_map<std::string_view, TokenKind> puncList = {
-    {"(", TokenKind::LParen},
-    {")", TokenKind::RParen},
-    {"{", TokenKind::LBrace},
-    {"}", TokenKind::RBrace},
-    {";", TokenKind::Semicolon}};
-
-bool isPunc(char c)
-{
-    std::string string_c(1, c);
-    return puncList.count(string_c) != 0;
-}
+bool isPunc(char c);
 TokenKind getKindOfPunctuation(std::string_view c);
 
 #endif

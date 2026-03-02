@@ -4,4 +4,4 @@
 #include <string_view>
 
 TokenKind GetKindOfIdentifier(std::string_view input);
-#endif TOKEN_H
+#endif

@@ -36,8 +36,9 @@ char Lexer::peak()
 
 char Lexer::advance()
 {
-    m_pos++;
+
     char outputChar = m_buffer[m_pos];
+    m_pos++;
     return outputChar;
 }
 
@@ -47,7 +48,7 @@ Token Lexer::nextToken()
     // peak to see what type
     if (firstChar == '\0')
     {
-        return Token(Endoffile, '\0');
+        return Token(Endoffile, "\0");
     }
     else if (isAlpha(firstChar) || firstChar == '_') // identifier
     {
@@ -88,8 +89,10 @@ Token Lexer::nextToken()
         // since every punctuation is single length for now, no need to loop
         string_view text(&m_buffer[m_pos], 1);
         TokenKind kind = getKindOfPunctuation(text);
+        advance();
         return Token(kind, text);
     }
+    return Token(Invalid, "");
 }
 
 void Lexer::stripWhiteSpace()
