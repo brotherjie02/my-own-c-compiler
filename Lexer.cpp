@@ -36,10 +36,8 @@ char Lexer::peak()
 
 char Lexer::advance()
 {
-
-    char outputChar = m_buffer[m_pos];
     m_pos++;
-    return outputChar;
+    return m_buffer[m_pos];
 }
 
 Token Lexer::nextToken()
@@ -59,9 +57,9 @@ Token Lexer::nextToken()
             tokenLength++;
             curChar = advance();
         }
-        string_view text(&m_buffer[m_pos], tokenLength);
+        string_view text(&m_buffer[m_pos - tokenLength], tokenLength);
         // keyword?
-        TokenKind kind = GetKindOfIdentifier(text.data());
+        TokenKind kind = GetKindOfIdentifier(text);
 
         if (kind != Kw_Invalid)
         {
