@@ -6,8 +6,7 @@ using namespace std;
 unordered_map<string_view, TokenKind> kwDict = {
     {"int", TokenKind::Kw_Int},
     {"return", TokenKind::Kw_Return},
-    {"void", TokenKind::Kw_Void},
-    {"main", TokenKind::Kw_Main}};
+    {"void", TokenKind::Kw_Void}};
 
 TokenKind GetKindOfIdentifier(string_view input)
 {

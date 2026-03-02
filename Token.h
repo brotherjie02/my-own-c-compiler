@@ -19,7 +19,6 @@ enum TokenKind
     Semicolon,
 
     // Keywords
-    Kw_Main,
     Kw_Int,
     Kw_Void,
     Kw_Return,
