@@ -152,11 +152,3 @@ void Lexer::DEBUG_printAllTokens()
         cout << "Kind: " << m_tokens[i].m_kind << " Text: " << m_tokens[i].m_lexeme << endl;
     }
 }
-
-int main(void)
-{
-    Lexer lexer = Lexer("test.c");
-    lexer.makeTokenFromStart();
-    lexer.DEBUG_printAllTokens();
-    return 0;
-}

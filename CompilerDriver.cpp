@@ -7,6 +7,16 @@
 #include <cstdio>
 #include <filesystem>
 #include <vector>
+#include "Lexer.h"
+#include "Token.h"
+
+enum Stage
+{
+    FULL,
+    STOPAFTERLEXER,
+    STOPAFTERPARSER,
+    STOPAFTERCODEGEN
+};
 
 void FailCleanUp(std::vector<std::string> &generatedFiles)
 {
@@ -16,28 +26,33 @@ void FailCleanUp(std::vector<std::string> &generatedFiles)
     }
 }
 
+void RunLex(std::string preprocessedFileName)
+{
+    Lexer lexer(preprocessedFileName.data());
+    lexer.makeTokenFromStart();
+    lexer.DEBUG_printAllTokens();
+}
+
 int main(int argc, char **argv)
 {
     std::string inputFileName = argv[1]; // first argument is always the input file
-    for (int i = 2; i < argc; i++)
+    Stage stageFlag = FULL;              // which stage to stop after
+
+    if (argc == 3)
     {
-        std::string flag = argv[i];
-        if (flag == "--lex")
+        // if a flag is provided
+        std::string flagString = argv[2];
+        if (flagString == "--lex")
         {
+            stageFlag = STOPAFTERLEXER;
         }
-        else if (flag == "parse")
+        else if (flagString == "--parse")
         {
+            stageFlag = STOPAFTERPARSER;
         }
-        else if (flag == "codegen")
+        else if (flagString == "--codegen")
         {
-        }
-        else if (flag == "-S")
-        {
-        }
-        else
-        {
-            std::cout << "Invalid Flag Provided" << std::endl;
-            return 1;
+            stageFlag = STOPAFTERCODEGEN;
         }
     }
     std::vector<std::string> generatedFiles;
@@ -46,6 +61,7 @@ int main(int argc, char **argv)
     std::string baseName = inputPath.stem();
     inputPath = inputPath.parent_path();
 
+    // PREPROCESSING
     std::string preprocessedName = inputPath / ("PREPROCESSED_" + baseName + ".c");
 
     std::string command = "gcc -E -P " + inputFileName + " -o " + preprocessedName;
@@ -60,8 +76,17 @@ int main(int argc, char **argv)
     {
         std::cout << "Preprocessed Stage Failed" << std::endl;
     }
-    std::string asmName = inputPath / (baseName + ".s");
 
+    // LEXER
+    RunLex(preprocessedName);
+    if (stageFlag == STOPAFTERLEXER)
+    {
+        FailCleanUp(generatedFiles);
+        return 0;
+    }
+
+    // COMPILATION
+    std::string asmName = inputPath / (baseName + ".s");
     command = "gcc -S " + preprocessedName + " -o " + asmName;
     if (std::system(command.c_str()) == 0)
     {
@@ -75,6 +100,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    // REMOVING PREPROCESSED FILE
     if (remove(preprocessedName.c_str()) == 0)
     {
         std::cout << "Removed Preprocessed Stage Success" << std::endl;
@@ -85,6 +111,7 @@ int main(int argc, char **argv)
         std::cout << "Removed Preprocessed Stage Failed" << std::endl;
     }
 
+    // ASSEMBLE AND LINKING STAGE
     std::string objectName = inputPath / baseName;
 
     command = "gcc " + asmName + " -o " + objectName;
@@ -98,6 +125,8 @@ int main(int argc, char **argv)
         std::cout << "Assemble and Linking Stage Failed" << std::endl;
         return 1;
     }
+
+    // REMOVING ASM FILE
     if (remove(asmName.c_str()) == 0)
     {
         std::cout << "Removed Asm Stage Success" << std::endl;
