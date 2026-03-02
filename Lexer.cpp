@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Keyword.h"
 #include "Token.h"
+#include "Punctuation.h"
 
 using namespace std;
 
@@ -82,6 +83,21 @@ Token Lexer::nextToken()
         string_view text(&m_buffer[m_pos - tokenLength], tokenLength);
         return Token(Constant, text);
     }
+    else if (isPunc(firstChar))
+    {
+        // since every punctuation is single length for now, no need to loop
+        string_view text(&m_buffer[m_pos], 1);
+        TokenKind kind = getKindOfPunctuation(text);
+        return Token(kind, text);
+    }
+}
+
+void Lexer::stripWhiteSpace()
+{
+    while (isWhiteSpace(peak()))
+    {
+        advance();
+    }
 }
 
 bool Lexer::isAlpha(char c)
@@ -102,7 +118,44 @@ bool Lexer::isNum(char c)
     return false;
 }
 
+bool Lexer::isWhiteSpace(char c)
+{
+    if (c == ' ' || c == '\n')
+    {
+        return true;
+    }
+    return false;
+}
+
+void Lexer::makeTokenFromStart()
+{
+    while (m_pos < m_fileSize)
+    {
+        if (isWhiteSpace(peak()))
+        {
+            stripWhiteSpace();
+        }
+        else
+        {
+            // tidy, start to parse next token
+            Token newToken = nextToken();
+            m_tokens.push_back(newToken);
+        }
+    }
+}
+
+void Lexer::DEBUG_printAllTokens()
+{
+    for (int i = 0; i < m_tokens.size(); i++)
+    {
+        cout << "Kind: " << m_tokens[i].m_kind << " Text: " << m_tokens[i].m_lexeme << endl;
+    }
+}
+
 int main(void)
 {
     Lexer lexer = Lexer("test.c");
+    lexer.makeTokenFromStart();
+    lexer.DEBUG_printAllTokens();
+    return 0;
 }

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LEXER_H
+#define LEXER_H
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -20,10 +21,14 @@ public:
     char peak();    // look at next character without moving
     char advance(); // consume and move next character
     Token nextToken();
+    void stripWhiteSpace();
+    void makeTokenFromStart();
+    void DEBUG_printAllTokens();
 
 private:
     bool isAlpha(char c);
     bool isNum(char c);
+    bool isWhiteSpace(char c);
 
     std::vector<Token> m_tokens;
     const char *m_filepath;
@@ -32,3 +37,4 @@ private:
     LexerState m_state;
     size_t m_pos;
 };
+#endif
