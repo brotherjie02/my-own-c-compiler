@@ -95,7 +95,11 @@ Token Lexer::nextToken()
         advance();
         return Token(kind, text);
     }
-    return Token(Invalid, "");
+    else
+    {
+        throw logic_error("Invalid token");
+        return Token(Invalid, "");
+    }
 }
 
 void Lexer::stripWhiteSpace()

@@ -26,6 +26,30 @@ void FailCleanUp(std::vector<std::string> &generatedFiles)
     }
 }
 
+static bool IsStageFlag(const std::string &s)
+{
+    return s == "--lex" || s == "--parse" || s == "--codegen";
+}
+
+static Stage StageFromFlag(const std::string &s)
+{
+    if (s == "--lex")
+        return STOPAFTERLEXER;
+    if (s == "--parse")
+        return STOPAFTERPARSER;
+    if (s == "--codegen")
+        return STOPAFTERCODEGEN;
+    return FULL;
+}
+
+static std::string QuoteIfNeeded(const std::string &s)
+{
+    // crude but effective for paths with spaces
+    if (s.find(' ') != std::string::npos)
+        return "\"" + s + "\"";
+    return s;
+}
+
 void RunLex(std::string preprocessedFileName)
 {
     Lexer lexer(preprocessedFileName.data());
@@ -35,24 +59,38 @@ void RunLex(std::string preprocessedFileName)
 
 int main(int argc, char **argv)
 {
-    std::string inputFileName = argv[1]; // first argument is always the input file
-    Stage stageFlag = FULL;              // which stage to stop after
-
-    if (argc == 3)
+    if (argc < 2 || argc > 3)
     {
-        // if a flag is provided
-        std::string flagString = argv[2];
-        if (flagString == "--lex")
+        std::cerr << "usage: CompilerDriver [--lex|--parse|--codegen] <input.c>\n";
+        return 1;
+    }
+
+    Stage stageFlag = FULL;
+    std::string inputFileName;
+
+    if (argc == 2)
+    {
+        inputFileName = argv[1];
+    }
+    else // argc == 3
+    {
+        std::string a1 = argv[1];
+        std::string a2 = argv[2];
+
+        if (IsStageFlag(a1) && !IsStageFlag(a2))
         {
-            stageFlag = STOPAFTERLEXER;
+            stageFlag = StageFromFlag(a1);
+            inputFileName = a2;
         }
-        else if (flagString == "--parse")
+        else if (!IsStageFlag(a1) && IsStageFlag(a2))
         {
-            stageFlag = STOPAFTERPARSER;
+            stageFlag = StageFromFlag(a2);
+            inputFileName = a1;
         }
-        else if (flagString == "--codegen")
+        else
         {
-            stageFlag = STOPAFTERCODEGEN;
+            std::cerr << "error: expected one stage flag and one input file\n";
+            return 1;
         }
     }
     std::vector<std::string> generatedFiles;
@@ -86,6 +124,7 @@ int main(int argc, char **argv)
     {
         FailCleanUp(generatedFiles);
         std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
     }
     if (stageFlag == STOPAFTERLEXER)
     {
