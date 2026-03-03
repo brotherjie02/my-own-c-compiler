@@ -5,6 +5,7 @@
 #include "Keyword.h"
 #include "Token.h"
 #include "Punctuation.h"
+#include <stdexcept>
 
 using namespace std;
 
@@ -78,6 +79,10 @@ Token Lexer::nextToken()
         {
             tokenLength++;
             curChar = advance();
+            if (isAlpha(curChar))
+            {
+                throw std::logic_error("Invalid Constant Token");
+            }
         }
         string_view text(&m_buffer[m_pos - tokenLength], tokenLength);
         return Token(Constant, text);

@@ -78,7 +78,15 @@ int main(int argc, char **argv)
     }
 
     // LEXER
-    RunLex(preprocessedName);
+    try
+    {
+        RunLex(preprocessedName);
+    }
+    catch (const std::logic_error &e)
+    {
+        FailCleanUp(generatedFiles);
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
     if (stageFlag == STOPAFTERLEXER)
     {
         FailCleanUp(generatedFiles);
