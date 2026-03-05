@@ -64,6 +64,7 @@ int main(int argc, char **argv)
         std::cerr << "usage: CompilerDriver [--lex|--parse|--codegen] <input.c>\n";
         return 1;
     }
+    // FLAG HANDLING, ALLOWS FLAG FIRST OR SECOND
 
     Stage stageFlag = FULL;
     std::string inputFileName;
