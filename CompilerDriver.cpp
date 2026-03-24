@@ -42,14 +42,6 @@ static Stage StageFromFlag(const std::string &s)
     return FULL;
 }
 
-static std::string QuoteIfNeeded(const std::string &s)
-{
-    // crude but effective for paths with spaces
-    if (s.find(' ') != std::string::npos)
-        return "\"" + s + "\"";
-    return s;
-}
-
 void RunLex(std::string preprocessedFileName)
 {
     Lexer lexer(preprocessedFileName.data());
