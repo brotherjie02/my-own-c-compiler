@@ -4,8 +4,12 @@
 
 class AST_exp : public AST_node
 {
-public:
+};
+
+class AST_constant : public AST_exp
+{
 protected:
+    int m_value;
 };
 
 #endif
