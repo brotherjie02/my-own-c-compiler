@@ -1,8 +1,8 @@
 #ifndef ASTEXP_H
 #define ASTEXP_H
-#include "ASTNode.h"
+#include "AST_node.h"
 
-class ASTStatement : public ASTNode
+class AST_exp : public AST_node
 {
 public:
 protected:
