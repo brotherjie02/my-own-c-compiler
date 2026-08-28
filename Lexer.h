@@ -24,13 +24,12 @@ public:
     void stripWhiteSpace();
     void makeTokenFromStart();
     void DEBUG_printAllTokens();
+    std::vector<Token> m_tokens;
 
 private:
     bool isAlpha(char c);
     bool isNum(char c);
     bool isWhiteSpace(char c);
-
-    std::vector<Token> m_tokens;
     const char *m_filepath;
     std::string m_buffer;
     int m_fileSize;
