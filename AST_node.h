@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include "Token.h"
 
 class AST_node
 {
@@ -11,10 +12,13 @@ public:
     virtual ~AST_node() = default;
 };
 
-class AST_identifer : public AST_node
+class AST_identifier : public AST_node
 {
 public:
-    std::string name;
+    AST_identifier(Token token) : m_token(token) {};
+
+protected:
+    Token m_token;
 };
 
 class AST_exp : public AST_node
@@ -29,33 +33,38 @@ protected:
 
 class AST_statement : public AST_node
 {
+public:
+    AST_statement(std::unique_ptr<AST_exp> exp) : m_exp(std::move(exp)) {}
+
+protected:
+    std::unique_ptr<AST_exp> m_exp;
 };
 
-class AST_return : public AST_statement
+class AST_function_definition : public AST_node
 {
 public:
-    explicit AST_return(std::unique_ptr<AST_exp> exp)
-        : m_expression(std::move(exp))
+    AST_function_definition(std::unique_ptr<AST_identifier> name, std::unique_ptr<AST_statement> body) : m_functionName(std::move(name)), m_functionBody(std::move(body)) {}
+
+protected:
+    std::unique_ptr<AST_identifier> m_functionName;
+    std::unique_ptr<AST_statement> m_functionBody;
+};
+
+class AST_program : public AST_node
+{
+public:
+    AST_program(std::unique_ptr<AST_function_definition> function) : m_functionDefinition(std::move(function))
     {
     }
 
 protected:
-    std::unique_ptr<AST_exp> m_expression;
-};
-
-/// @brief A function definition consists of a name and a statement body.
-class AST_function_definition : public AST_node
-{
-protected:
-    std::unique_ptr<AST_identifer> m_functionName;
-    std::unique_ptr<AST_statement> m_functionBody;
-};
-
-/// @brief A program consists of a function definition.
-class AST_program : public AST_node
-{
-protected:
     std::unique_ptr<AST_function_definition> m_functionDefinition;
+};
+
+class AST_int : public AST_exp
+{
+protected:
+    Token m_constantToken;
 };
 
 #endif

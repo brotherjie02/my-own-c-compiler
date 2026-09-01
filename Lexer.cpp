@@ -158,6 +158,6 @@ void Lexer::DEBUG_printAllTokens()
 {
     for (int i = 0; i < m_tokens.size(); i++)
     {
-        cout << "Kind: " << m_tokens[i].m_kind << " Text: " << m_tokens[i].m_lexeme << endl;
+        cout << "Kind: " << m_tokens[i].m_kind << " Text: " << m_tokens[i].m_lexeme << " Length: " << m_tokens[i].m_length << endl;
     }
 }
