@@ -9,6 +9,10 @@
 #include <vector>
 #include "Lexer.h"
 #include "Token.h"
+#include "Parser.h"
+
+Lexer *lexer;
+Parser *parser;
 
 enum Stage
 {
@@ -44,9 +48,16 @@ static Stage StageFromFlag(const std::string &s)
 
 void RunLex(std::string preprocessedFileName)
 {
-    Lexer lexer(preprocessedFileName.data());
-    lexer.makeTokenFromStart();
-    lexer.DEBUG_printAllTokens();
+    lexer = new Lexer(preprocessedFileName.data());
+    lexer->makeTokenFromStart();
+    lexer->DEBUG_printAllTokens();
+}
+
+void RunParser()
+{
+    parser = new Parser(lexer->m_tokens);
+    std::unique_ptr<AST_program> programNode = parser->ParseProgram();
+    programNode->print(0);
 }
 
 int main(int argc, char **argv)
@@ -120,6 +131,22 @@ int main(int argc, char **argv)
         return 1;
     }
     if (stageFlag == STOPAFTERLEXER)
+    {
+        FailCleanUp(generatedFiles);
+        return 0;
+    }
+
+    try
+    {
+        RunParser();
+    }
+    catch (const std::logic_error &e)
+    {
+        FailCleanUp(generatedFiles);
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+    if (stageFlag == STOPAFTERPARSER)
     {
         FailCleanUp(generatedFiles);
         return 0;

@@ -27,6 +27,11 @@ enum TokenKind
 
 struct Token
 {
+    // only used for invalid tokens
+    Token(TokenKind kind)
+    {
+        m_kind = kind;
+    }
     Token(TokenKind kind, std::string_view text)
     {
         m_kind = kind;

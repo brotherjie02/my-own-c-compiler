@@ -9,15 +9,17 @@
 class Parser
 {
 public:
-    Parser(std::vector<Token> &tokens);
+    Parser(const std::vector<Token> &tokens);
+    std::unique_ptr<AST_program> ParseProgram();
 
 private:
     std::unique_ptr<AST_statement> ParseStatement();
-    std::unique_ptr<AST_program> ParseProgram();
+
     std::unique_ptr<AST_exp> ParseExpression();
     std::unique_ptr<AST_function_definition> ParseFunction();
     std::unique_ptr<AST_identifier> ParseIdentifier();
     std::unique_ptr<AST_int> ParseInt();
+    Token Peek(int offset = 0);
 
     Token Expects(TokenKind expected);
     int curIndex = 0;

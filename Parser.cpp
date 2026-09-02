@@ -1,6 +1,10 @@
 #include "Parser.h"
 #include "Keyword.h"
 
+Parser::Parser(const std::vector<Token> &tokens) : m_tokens(tokens)
+{
+}
+
 std::unique_ptr<AST_statement> Parser::ParseStatement()
 {
     Expects(Kw_Return);
@@ -29,7 +33,7 @@ std::unique_ptr<AST_function_definition> Parser::ParseFunction()
     Expects(LBrace);
     std::unique_ptr<AST_statement> body = ParseStatement();
     Expects(RBrace);
-    return std::make_unique<AST_function_definition>(name, body);
+    return std::make_unique<AST_function_definition>(std::move(name), std::move(body));
 }
 
 std::unique_ptr<AST_int> Parser::ParseInt()
@@ -58,4 +62,14 @@ Token Parser::Expects(TokenKind expected)
     }
     curIndex++; // consumes the current token
     return actual;
+}
+
+Token Parser::Peek(int offset)
+{
+    int requestedIndex = curIndex + offset;
+    if (requestedIndex >= m_tokens.size() || requestedIndex < 0)
+    {
+        return Token(Invalid);
+    }
+    return m_tokens[curIndex + offset];
 }
