@@ -15,7 +15,12 @@ std::unique_ptr<AST_statement> Parser::ParseStatement()
 
 std::unique_ptr<AST_program> Parser::ParseProgram()
 {
-    return std::make_unique<AST_program>(ParseFunction());
+    std::unique_ptr<AST_program> result = std::make_unique<AST_program>(ParseFunction());
+    if (!ProcessedAllTokens())
+    {
+        throw std::logic_error("Didn't process all tokens.");
+    }
+    return result;
 }
 
 std::unique_ptr<AST_exp> Parser::ParseExpression()
@@ -72,4 +77,9 @@ Token Parser::Peek(int offset)
         return Token(Invalid);
     }
     return m_tokens[curIndex + offset];
+}
+
+bool Parser::ProcessedAllTokens()
+{
+    return curIndex >= m_tokens.size();
 }

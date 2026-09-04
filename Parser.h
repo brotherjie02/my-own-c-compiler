@@ -11,6 +11,7 @@ class Parser
 public:
     Parser(const std::vector<Token> &tokens);
     std::unique_ptr<AST_program> ParseProgram();
+    bool ProcessedAllTokens();
 
 private:
     std::unique_ptr<AST_statement> ParseStatement();
